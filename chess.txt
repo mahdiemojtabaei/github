@@ -1,0 +1,731 @@
+
+package chess;
+
+import java.util.LinkedList;
+import java.math.*;
+import java.util.Scanner;
+import java.util.Stack;
+
+public class Chess {
+    
+    public static void main(String[] args) {
+        Stack<ctr_z> s=new Stack<ctr_z>();
+        Game game=new Game();
+        game.Start(s);
+        
+    }
+  
+}
+
+
+ class checker {
+    String name;
+    String color;
+    public checker(String name,String color){
+        this.name=name;
+        this.color=color;
+    }
+    
+}
+
+
+ class Board {
+    
+    checker b[][]=new checker[8][8];
+    public Board(){
+        b[0][0]=new checker("rook" , "b");//rokh
+        b[0][1]=new checker("knight" , "b");//asb
+        b[0][2]=new checker("bishop" , "b");//fil
+        b[0][3]=new checker("queen" , "b");//vazir
+        b[0][4]=new checker("king" , "b");//shah
+        b[0][5]=new checker("bishop" , "b");
+        b[0][6]=new checker("knight" , "b");
+        b[0][7]=new checker("rook" , "b");
+        for(int i=0;i<8;i++)
+            b[1][i]=new checker("pawn" , "b");//sarbaz
+        b[7][0]=new checker("rook" , "w");
+        b[7][1]=new checker("knight" , "w");//asb
+        b[7][2]=new checker("bishop" , "w");//fil
+        b[7][3]=new checker("queen" , "w");//vazir
+        b[7][4]=new checker("king" , "w");
+        b[7][5]=new checker("bishop" , "w");
+        b[7][6]=new checker("knight" , "w");
+        b[7][7]=new checker("rook" , "w");
+        for(int i=0;i<8;i++)
+            b[6][i]=new checker("pawn" , "w");//sarbaz
+    }
+    Boolean check(int row1, int col1, int row2, int col2 , String color)
+    {
+        if(row1<0 || row1>7 || col1<0 || col1>7 || row2<0 || row2>7 || col2<0 || col2>7)
+            return false;
+        if(b[row1][col1]==null)
+            return false;
+        if(!b[row1][col1].color.equals(color))
+            return false;
+        if(b[row2][col2]!=null && b[row2][col2].color.equals(color))
+            return false;
+        //rook:
+        if(b[row1][col1].name.equals("rook") ||
+                (b[row1][col1].name.equals("queen") && (row1 == row2 || col1 == col2)))
+        {
+            if(row1==row2)
+            {
+                if(col2>col1)
+                {
+                    for(int j=col1 +1;j<col2;j++)
+                        if(b[row1][j]!=null)
+                            return false;
+                }
+                else
+                    for(int j=col1 -1;j>col2;j--)
+                        if(b[row1][j]!=null)
+                            return false;
+                return true;
+            }
+            else if(col1==col2)
+            {
+                if(row2>row1)
+                {
+                    for(int i=row1 +1;i<row2;i++)
+                        if(b[i][col1]!=null)
+                            return false;
+                }
+                else 
+                    for(int i=row1 -1;i>row2;i--)
+                        if(b[i][col1]!=null)
+                            return false;
+                return true;
+            }
+            return false;
+        }
+            //knight:
+            if(b[row1][col1].name.equals("knight"))
+            {
+                if(((row2==row1+2 && col2==col1+1) || (row2==row1+2 && col2==col1-1) || 
+                   (row2==row1+1 && col2==col1+2) || (row2==row1+1 && col2==col1-2) || 
+                        (row2==row1-1 && col2==col1+2) || (row2==row1-1 && col2==col1-2) ||
+                        (row2==row1-2 && col2==col1+1) || (row2==row1-2 && col2==col1+-1)))
+                    return true;
+                else
+                    return false;
+            }
+            //bishop
+            if(b[row1][col1].name.equals("bishop") || 
+                    (b[row1][col1].name.equals("queen") && (row1 != row2 && col1 != col2)))
+            { 
+                if(Math.abs(row1-row2) != Math.abs(col1-col2))
+                    return false;
+                if(row2<row1 && col2>col1)
+                {
+                    for(int i=1;row1-i>row2 && col1+i<col2 ;i++)
+                    {
+                        if(b[row1-i][col1+i]!=null)
+                            return false;
+                    }
+                }
+                else if(row2<row1 && col2<col1)
+                {
+                    for(int i=1;row1-i>row2 && col1-i>col2 ;i++)
+                    {
+                        if(b[row1-i][col1-i]!=null)
+                            return false;
+                    }
+                }
+                 else if(row2>row1 && col2>col1)
+                {
+                    for(int i=1;row1+i<row2 && col1+i<col2 ;i++)
+                    {
+                        if(b[row1+i][col1+i]!=null)
+                            return false;
+                    }
+                }
+                 else if(row2>row1 && col2<col1)
+                {
+                    for(int i=1;row1+i<row2 && col1-i>col2 ;i++)
+                    {
+                        if(b[row1+i][col1-i]!=null)
+                            return false;
+                    }
+                }
+                return true;
+            }
+            //pawn:
+            if(b[row1][col1].name.equals("pawn"))
+            {
+                if(col1==col2)
+                {
+                    if(b[row2][col2] == null)
+                    {
+                        if(color.equals("w"))
+                        {
+                            if(row2 == row1 -1)
+                                return true;
+                            if(row1 == 6 && row2 == row1 -2 && b[row1 -1][col2] == null)
+                                return true;
+                        }
+                        else
+                        {
+                            if(row2 == row1 +1)
+                                return true;
+                            if(row1 == 1 && row2 == row1 +2 && b[row1 +1][col2] == null)
+                                return true;
+                        }
+                    }
+                }
+                else if(b[row2][col2] != null && color.equals("w") && b[row2][col2].color.equals("b") && (row2==row1-1 && (col2==col1+1 || col2==col1-1)))
+                    return true;
+                else if(b[row2][col2] != null && color.equals("b") && b[row2][col2].color.equals("w")&& (row2==row1+1 && (col2==col1+1 || col2==col1-1)))
+                    return true;
+                return false;
+            } 
+            return false;
+    }
+    boolean check_king(int row1, int col1, int row2, int col2 , String color)
+    {
+        if(row1<0 || row1>7 || col1<0 || col1>7 || row2<0 || row2>7 || col2<0 || col2>7)
+            return false;
+        if(b[row1][col1]==null)
+            return false;
+        if(!b[row1][col1].color.equals(color))
+            return false;
+        if(b[row2][col2]!=null && b[row2][col2].color.equals(color))
+            return false;
+        if((((row2 == row1 -1) &&((col2 == col1 -1) || (col2 == col1) || (col2 == col1 +1))) ||
+                ((row2 == row1) &&((col2 == col1 -1) || (col2 == col1 +1))) ||
+                ((row2 == row1 +1) &&((col2 == col1 -1) || (col2 == col1) || (col2 == col1 +1)))))
+        {
+            for(int i=0;i<8;i++)
+            {
+                for(int j=0;j<8;j++)
+                {
+                    if(b[i][j] != null && !b[i][j].color.equals(color) && b[i][j].name.equals("king"))
+                    {
+                        for(int k=-1;k<2;k++)
+                            for(int r=-1;r<2;r++)
+                            {
+                                if((i+k == row2) && (j+r == col2))
+                                    return false;
+                            }
+                    }
+                    else if(b[i][j] != null && !b[i][j].color.equals(color))
+                    {
+                        if(check(i,j,row2,col2 ,b[i][j].color))
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    Boolean movement(int row1, int col1, int row2, int col2, String color,Stack<ctr_z> s)
+    {
+        ctr_z cz=new ctr_z(null,null, row1, col1,row2,col2);
+        if(row1<0 || row1>7 || col1<0 || col1>7 || row2<0 || row2>7 || col2<0 || col2>7)
+            return false;
+        if(b[row1][col1]==null)
+            return false;
+        if(!b[row1][col1].color.equals(color))
+            return false;
+        if(b[row2][col2]!=null && b[row2][col2].color.equals(color))
+            return false;
+        if(b[row1][col1].name.equals("king"))
+        {
+            if(check_king(row1, col1, row2, col2, color))
+            {
+                cz.c2 = b[row2][col2];
+                b[row2][col2] = b[row1][col1];
+                b[row1][col1] = null;
+                cz.c1=b[row2][col2];
+                cz.row1 = row1;
+                cz.col1 = col1;
+                cz.row2 = row2;
+                cz.col2 = col2;
+                s.push(cz);
+                return true;
+            }
+        }
+        else
+        {
+            Scanner sc=new Scanner(System.in);
+            if(b[row1][col1].name.equals("pawn"))
+            {
+                if(check(row1, col1, row2, col2, color) && ((b[row1][col1].color.equals("w") &&  row2 == 0)
+                        || (b[row1][col1].color.equals("b") && row2 == 7)))
+                {
+                    cz.c2 = b[row2][col2];
+                    b[row2][col2] = b[row1][col1];
+                    b[row1][col1] = null;
+                    cz.c1=b[row2][col2];
+                    cz.row1 = row1;
+                    cz.col1 = col1;
+                    cz.row2 = row2;
+                    cz.col2 = col2;
+                    s.push(cz);
+                    while(true)
+                    {
+                        System.out.println("Please enter a number for choosing one of them:");
+                        System.out.println("1.Queen");
+                        System.out.println("2.Rook");
+                        System.out.println("3.Bishop");
+                        System.out.println("4.Knight");
+                        String st=sc.next();
+                        switch (st) {
+                            case "1":
+                                b[row2][col2].name="queen";
+                                return true;
+                            case "2":
+                                b[row2][col2].name="rook";
+                                return true;
+                            case "3":
+                                b[row2][col2].name="bishop";
+                                return true;
+                            case "4":
+                                b[row2][col2].name="knight";
+                                return true;
+                            default:
+                                System.out.println("Incorrect input, please enter a correct number");
+                                break;
+                        }
+                        
+                    }
+                }
+                if(check(row1, col1, row2, col2, color))
+                    {
+                        cz.c2 = b[row2][col2];
+                        b[row2][col2] = b[row1][col1];
+                        b[row1][col1] = null;
+                        cz.c1=b[row2][col2];
+                        cz.row1 = row1;
+                        cz.col1 = col1;
+                        cz.row2 = row2;
+                        cz.col2 = col2;
+                        s.push(cz);
+                        return true;
+                    }
+            }
+            else if(check(row1, col1, row2, col2, color))
+                {
+                    cz.c2 = b[row2][col2];
+                    b[row2][col2] = b[row1][col1];
+                    b[row1][col1] = null;
+                    cz.c1=b[row2][col2];
+                    cz.row1 = row1;
+                    cz.col1 = col1;
+                    cz.row2 = row2;
+                    cz.col2 = col2;
+                    s.push(cz);
+                    return true;
+                }
+        }
+        return false;
+    }
+    void printBoard()
+    {
+        for(int i=0;i<8;i++)
+        {
+            for(int j=0;j<8;j++)
+            {
+                if(b[i][j]==null)
+                    System.out.print("-- ");
+                else if(b[i][j].color.equals("w"))
+                {
+                    switch (b[i][j].name) {
+                        case "king":
+                            System.out.print("wk ");
+                            break;
+                        case "queen":
+                            System.out.print("wq ");
+                            break;
+                        case "knight":
+                            System.out.print("wn ");
+                            break;
+                        case "rook":
+                            System.out.print("wr ");
+                            break;
+                        case "bishop":
+                            System.out.print("wb ");
+                            break;
+                        case "pawn":
+                            System.out.print("wp ");
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (b[i][j].name) {
+                        case "king":
+                            System.out.print("bk ");
+                            break;
+                        case "queen":
+                            System.out.print("bq ");
+                            break;
+                        case "rook":
+                            System.out.print("br ");
+                            break;
+                        case "knight":
+                            System.out.print("bn ");
+                            break;
+                        case "bishop":
+                            System.out.print("bb ");
+                            break;
+                        case "pawn":
+                            System.out.print("bp ");
+                            break;
+                    }
+                    
+                }
+                    
+            }
+            System.out.print("       ");
+            for(int k=0;k<8;k++)
+                System.out.print("("+i+","+k+") ");   
+            System.out.println();
+        }
+        System.out.println();
+    }
+    void cz_function(Stack<ctr_z> s)
+    {
+        ctr_z c;
+        c = s.pop();
+        b[c.row1][c.col1] = c.c1;
+        b[c.row2][c.col2] = c.c2;
+    }
+    boolean kish(String color){
+        int kingrow=0,kingcol=0;
+        boolean f = true;
+        for(int i=0;i<8 && f;i++)
+            for(int j=0;j<8 && f;j++)
+                if(b[i][j] != null && b[i][j].name.equals("king") && b[i][j].color.equals(color))
+                {
+                    kingrow=i;
+                    kingcol=j;
+                    f = false;
+                }
+        for(int i=0;i<8;i++)
+            for(int j=0;j<8;j++)
+                if(b[i][j] != null && !b[i][j].color.equals(color) && !b[i][j].name.equals("king"))
+                    if(check(i,j,kingrow,kingcol,b[i][j].color))
+                        return true;
+        return false;
+    }
+    boolean checkmate(String color)
+    {
+        boolean f = true;
+        int kish = 0;
+        int kingrow=0,kingcol=0,kishrow=0,kishcol=0;
+        for(int i=0;i<8 && f;i++)
+            for(int j=0;j<8 && f;j++)
+            {
+                if(b[i][j] != null && b[i][j].name.equals("king") && b[i][j].color.equals(color))
+                {
+                    kingrow=i;
+                    kingcol=j;
+                }
+            } 
+        for(int i=0;i<8;i++)
+            for(int j=0;j<8;j++)
+            {
+                if(b[i][j] != null && !b[i][j].color.equals(color) && check(i,j,kingrow,kingcol,b[i][j].color))
+                    {
+                        kish++;
+                        kishrow = i;
+                        kishcol = j;
+                    }
+            }
+        if(kish == 2)
+        {
+            for(int j=-1;j<2;j++)
+                for(int i=-1;i<2;i++)
+                    if(check_king(kingrow, kingcol,kingrow+j, kingcol+i, b[kingrow][kingcol].color))
+                        return false;
+            return true;
+        }
+        else
+        {
+            for(int j=-1;j<2;j++)
+                for(int i=-1;i<2;i++)
+                    if(check_king(kingrow, kingcol,kingrow+j, kingcol+i, b[kingrow][kingcol].color))
+                        return false;
+            for(int i=0;i<8;i++)
+                for(int j=0;j<8;j++)
+                    if(b[i][j] != null && b[i][j].color.equals(color))
+                        if(check(i,j,kishrow,kishcol,b[i][j].color) == true)
+                            return false;
+            if(b[kishrow][kishcol].name.equals("bishop") ||
+                    (b[kishrow][kishcol].name.equals("queen") && (kishrow != kingrow && kishcol != kingcol)))
+            {
+                for(int i=0;i<8;i++)
+                    for(int j=0;j<8;j++)
+                        if(b[i][j] != null && b[i][j].color.equals(color))
+                        {
+                            if(kingrow<kishrow && kingcol>kishcol)
+                            {
+                                for(int k=1;kishrow-k>kingrow && kishcol+k<kingcol ;k++)
+                                {
+                                    if(check(i, j, kishrow-k, kishcol+k, b[i][j].color))
+                                        return false;
+                                }
+                            }
+                            if(kingrow<kishrow && kingcol<kishcol)
+                            {
+                                for(int k=1;kishrow-k>kingrow && kishcol-k>kingcol ;k++)
+                                {
+                                    if(check(i, j, kishrow-k, kishcol-k, b[i][j].color))
+                                        return false;
+                                }
+                            }
+                            if(kingrow>kishrow && kingcol>kishcol)
+                            {
+                                for(int k=1;kishrow+k<kingrow && kishcol+k<kingcol ;k++)
+                                {
+                                    if(check(i, j, kishrow+k, kishcol+k, b[i][j].color))
+                                        return false;
+                                }
+                            }
+                            if(kingrow>kishrow && kingcol<kishcol)
+                            {
+                                for(int k=1;kishrow+k<kingrow && kishcol-k>kingcol ;k++)
+                                {
+                                    if(check(i, j, kishrow+k, kishcol-k, b[i][j].color))
+                                        return false;
+                                }
+                            }
+                        }
+            }
+            if(b[kishrow][kishcol].name.equals("rook") ||
+                (b[kishrow][kishcol].name.equals("queen") && (kishrow == kingrow && kishcol == kingcol)))
+            {
+                for(int i=0;i<8;i++)
+                    for(int j=0;j<8;j++)
+                        if(b[i][j] != null && b[i][j].color.equals(color))
+                        {
+                            if(kishrow==kingrow)
+                            {   
+                                if(kingcol>kishcol)
+                                {
+                                    for(int k=kishcol +1;k<kingcol;k++)
+                                        if(check(i, j,kishrow ,k , b[i][j].color))   
+                                            return false;
+                                }
+                                else
+                                    for(int k=kishcol -1;k>kingcol;k--) 
+                                        if(check(i, j,kishrow ,k , b[i][j].color))
+                                            return false;            
+                            }   
+                            else if(kingcol==kishcol)
+                            {
+                                if(kingrow>kishrow) 
+                                {   
+                                    for(int k=kishrow +1;k<kingrow;k++)
+                                        if(check(i, j,k,kishcol , b[i][j].color)) 
+                                            return false;
+                                }
+                                else 
+                                    for(int k=kishrow -1;k>kingrow;k--)
+                                        if(check(i, j,k,kishcol , b[i][j].color)) 
+                                            return false;          
+                            }                
+                        }
+                        
+            }
+            return true;
+        }
+    }
+}
+class Game
+{
+    Scanner sc=new Scanner(System.in);
+    Board B=new Board();
+    player p1,p2;
+    Game()
+    {
+       System.out.println("player1 please enter your name");
+       p1=new player(sc.next(),"w");
+       System.out.println("player2 please enter your name");
+       p2=new player(sc.next(),"b");
+        System.out.println("player1 your picese are white and player2 your picese are black ");
+    }
+    void Start(Stack<ctr_z> s)
+    {
+        boolean flag_color=true;
+        boolean flag;
+        boolean flag2;
+        int count = 0;
+        String player_color,player_name;
+        while(true)
+        {
+            flag = true;
+            flag2 = true;
+            count = 0;
+            if(flag_color)
+            {
+                player_color="w";
+                player_name=p1.name;
+            }
+            else
+            {
+                player_color="b";
+                player_name=p2.name;
+            }
+            B.printBoard();
+            while(!s.isEmpty() && flag2)
+            {
+                System.out.println(player_name + " do you want to undo?");
+                System.out.println("1.yes");
+                System.out.println("2.no");
+                System.out.println("please enter a number.");
+                int num = sc.nextInt();
+                while(true)
+                {
+                    if(num == 1)
+                    {
+                        B.cz_function(s);
+                        count++;
+                        B.printBoard();
+                    }
+                    else if(num == 2)
+                    {
+                        if(count%2 == 1)
+                        {
+                            if(flag_color)
+                                flag_color = false;
+                            else
+                                flag_color = true;
+                            count = 0;
+                            flag = false;
+                        }
+                        flag2 = false;
+                    }
+                    else
+                        System.out.println("please enter a valid number.");
+                    break;
+                }
+            }
+            if(count%2==1)
+            {
+                flag = false;
+                if(flag_color)
+                    flag_color = false;
+                else
+                    flag_color = true;
+            }
+            if(B.kish(player_color) && flag)
+            {
+                if(B.checkmate(player_color))
+                    break;
+                else
+                {
+                   while(true)
+                   {
+                        System.out.println(player_name +" it's your turn please enter a cordinate of source");  
+                        int row1 =sc.nextInt();
+                        int col1 =sc.nextInt();
+                        System.out.println(player_name +" it's your turn please enter a cordinate of distination");
+                        int row2 =sc.nextInt();
+                        int col2 =sc.nextInt(); 
+                        if(! B.movement(row1, col1, row2, col2, player_color, s))
+                           System.out.println("wrong place!");
+                       else
+                       {
+                           if(B.kish(player_color))
+                           {
+                               System.out.println("you can not do it because you are still kish!");
+                               B.cz_function(s);
+                           }
+                           else
+                           {
+                               if(player_color.equals("w"))
+                                   flag_color=false;
+                               else
+                                   flag_color=true;
+                                   
+                               break;
+                           }
+                       }
+                   }
+                }
+                        
+            }
+            else if(flag)
+            {
+                while(true)
+                {
+                    System.out.println(player_name +" it's your turn please enter a cordinate of source");                       int row1 =sc.nextInt();
+                    int col1 =sc.nextInt();
+                    System.out.println(player_name +" it's your turn please enter a cordinate of distination");
+                    int row2 =sc.nextInt();
+                    int col2 =sc.nextInt(); 
+                    if(! B.movement(row1, col1, row2, col2, player_color, s))
+                        System.out.println("wrong place!");
+                    else
+                    {
+                        while((B.kish(player_color)))
+                        {
+                            System.out.println("you will kish with this movment!");
+                            B.cz_function(s);
+                            System.out.println(player_name +" it's your turn please enter a cordinate of source");  
+                            row1 =sc.nextInt();
+                            col1 =sc.nextInt();
+                            System.out.println(player_name +" it's your turn please enter a cordinate of distination");
+                            row2 =sc.nextInt();
+                            col2 =sc.nextInt(); 
+                            if(! B.movement(row1, col1, row2, col2, player_color, s))
+                                System.out.println("wrong place!");
+                            else
+                            {
+                                if(player_color.equals("w"))
+                                    flag_color=false;
+                                else
+                                    flag_color=true;          
+                                break;
+                            }
+                        }
+                        if(player_color.equals("w"))
+                            flag_color=false;
+                        else
+                            flag_color=true;          
+                        break;
+                    }
+                }
+            }
+            
+        }
+        if(!flag_color && flag)
+        {
+            System.out.println(p1.name + " is won!");
+        }
+        else if(flag)
+        {
+            System.out.println(p2.name + " is won!");
+        }
+    }
+    
+}
+ class player {
+    String name;
+    String color;
+    public player(String name,String color){
+        this.name=name;
+        this.color=color;
+    }
+}
+
+class ctr_z
+{
+    checker c1;
+    checker c2;
+    int row1;
+    int col1; 
+    int row2;
+    int col2; 
+     ctr_z(checker c1,checker c2,int row1,int col1,int row2,int col2)
+     {
+        this.c1 = c1;
+        this.c2 = c2;
+        this.row1=row1;
+        this.col1=col1;
+        this.row2=row2;
+        this.row1=row1;
+     }
+} 
